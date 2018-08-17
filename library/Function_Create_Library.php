@@ -145,12 +145,19 @@ class Function_Create_Library
         $dataType = strtolower($FunctionConfig['dataType']);
         // 处理输出
         if($dataType == 'get'){
+            $tishixinxi = '请求成功';
             $output = '{"errNum":0,"retMsg":"请求成功","retData":"请求数据"}';
         }else{
+            $tishixinxi = '';
             $output = '{"errNum":0,"retMsg":"提示信息","retData":true}';
         }
         // 处理名字
         $name = $FunctionConfig['name'].ucfirst($dataType);
+        // 处理明细
+        if($dataType == 'get')   {$names = 'Show';}
+        if($dataType == 'post')  {$names = 'Add'; }
+        if($dataType == 'put')   {$names = 'Edit';}
+        if($dataType == 'delete'){$names = 'Del'; }
         // 处理标题信息
         $String = "
 // ------ Controller控制器接代码 ------
@@ -164,9 +171,19 @@ class Function_Create_Library
         );
         // 处理内容
         $String.= "
-public function {$name}()
+public function {$name}(\\think\\Request \$request)
 {
-
+    // 实例化Service层逻辑类
+    \$".$FunctionConfig['name']."Service = new ".ucfirst($FunctionConfig['name'])."Service();
+    
+    // 获取传入参数
+    \${$dataType} = \$request->{$dataType}();
+    
+    // 执行Service逻辑
+    \$res = \$".$FunctionConfig['name'].'Service->'.$FunctionConfig['name'].$names."(\${$dataType});
+    
+    // 处理函数返回值
+    return RSD::wxReponse(\$res,'S','".$tishixinxi."');
 }
 ";
         // 返回数据
@@ -203,9 +220,12 @@ public function {$name}()
         );
         // 处理内容
         $String.= "
-public function {$name}()
+public function {$name}(\${$dataType})
 {
-
+    // TODO : 执行函数处理逻辑
+    
+    // TODO : 返回函数输出数据
+    return ['msg'=>'success','data'=>'返回数据'];
 }
 ";
         // 返回数据
@@ -228,10 +248,10 @@ public function {$name}()
             $output = "['msg'=>'success','data'=>'提示信息']";
         }
         // 处理明细
-        if($dataType == 'get')   {$names = 'Show';}
-        if($dataType == 'post')  {$names = 'Add'; }
-        if($dataType == 'put')   {$names = 'Edit';}
-        if($dataType == 'delete'){$names = 'Del'; }
+        if($dataType == 'get')   {$names = 'Show';$namen = 'Select';}
+        if($dataType == 'post')  {$names = 'Add'; $namen = 'Create';}
+        if($dataType == 'put')   {$names = 'Edit';$namen = 'Update';}
+        if($dataType == 'delete'){$names = 'Del'; $namen = 'Delete';}
         // 处理名字
         $name = $FunctionConfig['name'].$names;
         // 处理标题信息
@@ -247,9 +267,16 @@ public function {$name}()
         );
         // 处理内容
         $String.= "
-public function {$name}()
+public function {$name}(\${$dataType})
 {
-
+    // 实例化Dao层数据类
+    \${$FunctionConfig['name']}Dao = new ".ucfirst($FunctionConfig['name'])."Dao();
+    
+    // 执行Dao层逻辑
+    \$res = \$".$FunctionConfig['name'].'Dao->'.$FunctionConfig['name'].$namen."(\${$dataType});
+    
+    // 处理函数返回值
+    return RSD::wxReponse(\$res,'D');
 }
 ";
         // 返回数据
@@ -291,7 +318,7 @@ public function {$name}()
         );
         // 处理内容
         $String.= "
-public function {$name}();
+public function {$name}(\${$dataType});
 ";
         // 返回数据
         return $String;
@@ -332,9 +359,9 @@ public function {$name}();
         );
         // 处理内容
         $String.= "
-public function {$name}()
+public function {$name}(\${$dataType})
 {
-
+    // TODO :  ".ucfirst($FunctionConfig['name'])."Model 模型
 }
 ";
         // 返回数据
