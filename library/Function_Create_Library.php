@@ -66,26 +66,29 @@ class Function_Create_Library
         // 2. 验证传值内容是否正确
         self::inputValidate($FunctionConfig);
 
-        // 3. Controller 执行生成控制器代码
-        $String = self::controllerCreate($FunctionConfig);
+        // 3. Route 生成路由文件
+        $String = self::RouteCreate($FunctionConfig);
 
-        // 4. Service 执行生成逻辑函数代码
+        // 4. Controller 执行生成控制器代码
+        $String.= self::controllerCreate($FunctionConfig);
+
+        // 5. Service 执行生成逻辑函数代码
         $String.= self::libraryCreate($FunctionConfig);
 
-        // 5. Library 执行生成自定义类代码
+        // 6. Library 执行生成自定义类代码
         $String.= self::serviceCreate($FunctionConfig);
 
-        // 6. Interface 执行生成Dao层接口代码
+        // 7. Interface 执行生成Dao层接口代码
         $String.= self::interfaceCreate($FunctionConfig);
 
-        // 7. Dao 执行生成Dao层数据代码
+        // 8. Dao 执行生成Dao层数据代码
         $String.= self::daoCreate($FunctionConfig);
 
-        // 8. FilePut 处理信息成为文件
+        // 9. FilePut 处理信息成为文件
         file_put_contents('./Module_Code.php',$String);
 
-        // 9. Print_r 打印数据
-        print_r($String);
+        // 10. Print_r 打印数据
+        print_r('Function_Create_Success');
     }
 
     /**
@@ -133,6 +136,38 @@ class Function_Create_Library
         }
     }
 
+    /**
+     * 名 称 : RouteCreate()
+     * 功 能 : 执行生成路由文件代码
+     * 创 建 : 2018/08/20 14:13
+     */
+    private static function RouteCreate($FunctionConfig)
+    {
+        // 将传值状态转化成小写
+        $dataTypeL = strtolower($FunctionConfig['dataType']);
+        $DataTypeL = ucfirst($dataTypeL);
+        // 将传值状态转化成大写
+        $dataTypeU = strtoupper($FunctionConfig['dataType']);
+        // 获取名字
+        $name =  $FunctionConfig['name'];
+        $Name =  ucfirst($FunctionConfig['name']);
+        // 处理标题信息
+        $String = "
+// ------ Route路由代码 ------
+";
+        // 处理内容
+        $String.= "
+/**
+ * 传值方式 : {$dataTypeU}
+ * 路由功能 : {$FunctionConfig['explain']}
+ */
+Route::{$dataTypeL}(
+    ':v/{$name}_module/{$name}_route',
+    '{$name}_module/:v.controller.{$Name}Controller/{$name}{$DataTypeL}'
+);
+";
+    return $String;
+    }
 
     /**
      * 名 称 : controllerCreate()
@@ -183,7 +218,7 @@ public function {$name}(\\think\\Request \$request)
     \$res = \$".$FunctionConfig['name'].'Service->'.$FunctionConfig['name'].$names."(\${$dataType});
     
     // 处理函数返回值
-    return RSD::wxReponse(\$res,'S','".$tishixinxi."');
+    return \\RSD::wxReponse(\$res,'S','".$tishixinxi."');
 }
 ";
         // 返回数据
@@ -276,7 +311,7 @@ public function {$name}(\${$dataType})
     \$res = \$".$FunctionConfig['name'].'Dao->'.$FunctionConfig['name'].$namen."(\${$dataType});
     
     // 处理函数返回值
-    return RSD::wxReponse(\$res,'D');
+    return \\RSD::wxReponse(\$res,'D');
 }
 ";
         // 返回数据

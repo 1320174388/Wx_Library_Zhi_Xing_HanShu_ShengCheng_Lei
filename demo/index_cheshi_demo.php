@@ -13,15 +13,13 @@ Function_Create_Library::execCreateFunction([
     // 传值类型 : (GET/POST/PUT/DELETE)
     'dataType' => 'GET',
     // 函数名称 : 默认 __function
-    'name'     => 'login',
+    'name'     => 'cheshi',
     // 函数说明 : 默认 新创建函数
-    'explain'  => '用户登录',
+    'explain'  => '测试代码',
     // 函数输入 : 示例 [
-    //  '(String) $name => "名字"',
-    //  '(String) $name => "名字"'
+    //  '$get['goodLimit']  => '商品页码';',
     //]
     'input'    => [
-        '(String) $get["className"] => "分类名称"',
-        '(String) $get["classInfo"] => "分类介绍"',
+        '$get[\'goodLimit\']  => \'商品页码\';',
     ],
 ]);
