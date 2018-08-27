@@ -72,11 +72,11 @@ class Function_Create_Library
         // 4. Controller 执行生成控制器代码
         $String.= self::controllerCreate($FunctionConfig);
 
-        // 5. Service 执行生成逻辑函数代码
-        $String.= self::libraryCreate($FunctionConfig);
-
-        // 6. Library 执行生成自定义类代码
+        // 6. Service 执行生成逻辑函数代码
         $String.= self::serviceCreate($FunctionConfig);
+
+        // 5. Library 执行生成自定义类代码
+        $String.= self::libraryCreate($FunctionConfig);
 
         // 7. Interface 执行生成Dao层接口代码
         $String.= self::interfaceCreate($FunctionConfig);
@@ -304,6 +304,14 @@ public function {$name}(\${$dataType})
         $String.= "
 public function {$name}(\${$dataType})
 {
+    // 实例化验证器代码
+    \$validate  = new ".ucfirst($FunctionConfig['name'])."Validate();
+    
+    // 验证数据
+    if (!\$validate->scene('edit')->check(\${$dataType})) {
+        return ['msg'=>'error','data'=>\$validate->getError()];
+    }
+    
     // 实例化Dao层数据类
     \${$FunctionConfig['name']}Dao = new ".ucfirst($FunctionConfig['name'])."Dao();
     
