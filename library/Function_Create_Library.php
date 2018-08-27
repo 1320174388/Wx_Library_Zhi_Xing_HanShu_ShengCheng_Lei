@@ -75,19 +75,22 @@ class Function_Create_Library
         // 6. Service 执行生成逻辑函数代码
         $String.= self::serviceCreate($FunctionConfig);
 
-        // 5. Library 执行生成自定义类代码
+        // 7. Service 执行生成逻辑函数代码
+        $String.= self::validateCreate($FunctionConfig);
+
+        // 8. Library 执行生成自定义类代码
         $String.= self::libraryCreate($FunctionConfig);
 
-        // 7. Interface 执行生成Dao层接口代码
+        // 9. Interface 执行生成Dao层接口代码
         $String.= self::interfaceCreate($FunctionConfig);
 
-        // 8. Dao 执行生成Dao层数据代码
+        // 10. Dao 执行生成Dao层数据代码
         $String.= self::daoCreate($FunctionConfig);
 
-        // 9. FilePut 处理信息成为文件
+        // 11. FilePut 处理信息成为文件
         file_put_contents('./Module_Code.php',$String);
 
-        // 10. Print_r 打印数据
+        // 12. Print_r 打印数据
         print_r('Function_Create_Success');
     }
 
@@ -264,6 +267,58 @@ public function {$name}(\${$dataType})
 }
 ";
         // 返回数据
+        return $String;
+    }
+
+    /**
+     * 名 称 : validateCreate()
+     * 功 能 : 执行生成验证器代码
+     * 创 建 : 2018/08/17 10:25
+     */
+    private static function validateCreate($FunctionConfig)
+    {
+        // 处理标题信息
+        $String = "
+// ------ Validate验证器代码 ------
+";
+        // 处理自定义类注释信息
+        $String.= "
+/**
+ * 名  称 : \$rule
+ * 功  能 : 验证规则";
+        // 处理注释输入
+        if(!empty($FunctionConfig['input'])){
+            foreach ($FunctionConfig['input'] as $v)
+            {
+                $String.= "
+ * 输  入 : {$v}";
+            }
+        }else{
+            $String.= "
+ * 输  入 : --------------------------------------";
+        }
+        $String.= "
+ * 创  建 : ".date('Y/m/d H:i',time())."
+ */
+protected \$rule =   [
+    'name'  => 'require|max:25',
+    'age'   => 'number|between:1,120',
+    'email' => 'email',
+];
+
+/**
+ * 名  称 : \$message()
+ * 功  能 : 设置验证信息
+ * 创  建 : ".date('Y/m/d H:i',time())."
+ */
+protected \$message  =   [
+    'name.require' => '名称必须',
+    'name.max'     => '名称最多不能超过25个字符',
+    'age.number'   => '年龄必须是数字',
+    'age.between'  => '年龄只能在1-120之间',
+    'email'        => '邮箱格式错误',
+];
+";
         return $String;
     }
 
